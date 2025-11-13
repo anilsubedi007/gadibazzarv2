@@ -1,65 +1,249 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Search, TrendingUp } from "lucide-react";
+import dynamic from "next/dynamic";
+
+function CleanVehicleMarketplace() {
+  const router = useRouter();
+
+  // ============ DATA ============
+  const vehicleTypes = [
+    { type: "Cycle", img: "/images/bike/cycle.png", trending: false },
+    { type: "Bikes", img: "/images/bike/bike.png", trending: true },
+    { type: "Cars", img: "/images/cars/suv.png", trending: true },
+    { type: "Auto", img: "/images/cars/auto.png", trending: false },
+    { type: "Pickup", img: "/images/cars/pickup.png", trending: false },
+    { type: "Micro", img: "/images/cars/hiace.png", trending: false },
+    { type: "Bus", img: "/images/cars/bus.png", trending: false },
+    { type: "Truck", img: "/images/cars/truck.png", trending: false },
+    { type: "Tractor", img: "/images/cars/tractor.png", trending: false },
+  ];
+
+  const brands: Record<string, string[]> = {
+    Cycle: ["Hero", "Atlas", "Giant", "Trek", "Merida"],
+    Bikes: ["Yamaha", "Honda", "Suzuki", "Bajaj", "TVS", "KTM"],
+    Cars: ["Toyota", "Suzuki", "Hyundai", "Honda", "Nissan", "Kia", "Tata", "Mahindra"],
+    Auto: ["Bajaj", "Piaggio"],
+    Pickup: ["Tata", "Mahindra", "Isuzu"],
+    Micro: ["Suzuki", "Toyota", "Kia"],
+    Bus: ["Ashok Leyland", "Tata", "Eicher"],
+    Truck: ["Tata", "Ashok Leyland", "Volvo"],
+    Tractor: ["Mahindra", "Swaraj", "Sonalika"],
+  };
+
+  const provinces = [
+    "Province 1",
+    "Madhesh Province", 
+    "Bagmati Province",
+    "Gandaki Province",
+    "Lumbini Province",
+    "Karnali Province",
+    "Sudurpashchim Province",
+  ];
+
+  // ============ STATE ============
+  const [vehicleType, setVehicleType] = useState("Cycle");
+  const [brand, setBrand] = useState("");
+  const [province, setProvince] = useState("");
+
+  // ============ HANDLERS ============
+  const handleVehicleTypeChange = useCallback((type: string) => {
+    setVehicleType(type);
+    setBrand(""); // Reset brand when type changes
+  }, []);
+
+  const handleSearch = useCallback(() => {
+    const params = new URLSearchParams();
+    if (vehicleType) params.set("type", vehicleType);
+    if (brand) params.set("brand", brand);
+    if (province) params.set("province", province);
+
+    router.push(`/cars/results?${params.toString()}`);
+  }, [vehicleType, brand, province, router]);
+
+  const handleCategoryClick = useCallback((itemType: string) => {
+    const routes: Record<string, string> = {
+      Cars: "/cars/listings",
+      Bikes: "/bikes/listings",
+      Cycle: "/cycle/filters",
+      Auto: "/auto/filters"
+    };
+    
+    if (routes[itemType]) {
+      router.push(routes[itemType]);
+    } else {
+      router.push(`/cars/results?type=${itemType}`);
+    }
+  }, [router]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div
+      className="min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url('/images/landingpage/bg.jpg')" }}
+    >
+      <main className="pt-16 md:pt-24 px-4 md:px-8 pb-8">
+
+        {/* Browse Categories Section */}
+        <section className="max-w-6xl mx-auto mt-2 md:mt-12">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-6 md:p-8 border border-white/20">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                Browse by Category
+              </h2>
+            </div>
+
+            {/* Vehicle Categories Grid */}
+            <div className="grid grid-cols-3 md:grid-cols-9 gap-6 md:gap-6">
+              {vehicleTypes.map((item) => (
+                <div
+                  key={item.type}
+                  onClick={() => handleCategoryClick(item.type)}
+                  className="group cursor-pointer text-center relative hover:transform hover:scale-105 transition-all duration-300"
+                >
+                  {/* Trending Badge */}
+                  {item.trending && (
+                    <div className="absolute -top-2 -right-2 md:-top-3 md:-right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-2 py-1 md:px-3 md:py-1 rounded-full flex items-center gap-1 shadow-lg z-10">
+                      <TrendingUp className="w-2 h-2 md:w-3 md:h-3" />
+                      <span className="hidden md:inline">Hot</span>
+                      <span className="md:hidden">•</span>
+                    </div>
+                  )}
+
+                  {/* Vehicle Image */}
+                  <div className="mb-3 md:mb-4 flex justify-center">
+                    <div className="w-20 h-20 md:w-20 md:h-20 flex items-center justify-center">
+                      <img
+                        src={item.img}
+                        alt={item.type}
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300 filter drop-shadow-lg"
+                        style={{ maxWidth: '100%', maxHeight: '100%' }}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23e5e7eb'/%3E%3Cpath d='m39 35 1 10-1-10' stroke='%236b7280' stroke-width='2'/%3E%3Cpath d='m35 39 10 1-10-1' stroke='%236b7280' stroke-width='2'/%3E%3C/svg%3E";
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Vehicle Type Name */}
+                  <h3 className="font-bold text-gray-800 text-sm md:text-base group-hover:text-blue-600 transition-colors leading-tight px-1">
+                    {item.type}
+                  </h3>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Main Search Section */}
+        <section className="max-w-6xl mx-auto mt-6 md:mt-12">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 border border-white/20">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">
+                Find Your Perfect Vehicle
+              </h1>
+            </div>
+
+            {/* Main Search Form */}
+            <div className="space-y-6">
+              {/* Primary Search Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4">
+                {/* Vehicle Type */}
+                <div className="space-y-1 md:space-y-2">
+                  <label className="block text-sm font-medium text-gray-900 md:text-gray-700">Vehicle Type</label>
+                  <select
+                    value={vehicleType}
+                    onChange={(e) => handleVehicleTypeChange(e.target.value)}
+                    className="w-full p-4 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-500 md:text-gray-700 appearance-none"
+                  >
+                    {vehicleTypes.map((v) => (
+                      <option key={v.type} value={v.type}>
+                        {v.type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Brand */}
+                <div className="space-y-1 md:space-y-2">
+                  <label className="block text-sm font-medium text-gray-900 md:text-gray-700">Brand</label>
+                  <select
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                    className="w-full p-4 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-500 md:text-gray-700 appearance-none"
+                  >
+                    <option value="">All Brands</option>
+                    {brands[vehicleType]?.map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Location */}
+                <div className="space-y-1 md:space-y-2">
+                  <label className="block text-sm font-medium text-gray-900 md:text-gray-700">Location</label>
+                  <select
+                    value={province}
+                    onChange={(e) => setProvince(e.target.value)}
+                    className="w-full p-4 border border-gray-300 rounded-xl bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-500 md:text-gray-700 appearance-none"
+                  >
+                    <option value="">All Provinces</option>
+                    {provinces.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Search Button */}
+                <div className="space-y-1 md:space-y-2">
+                  <label className="block text-sm font-medium text-transparent">Search</label>
+                  <button
+                    onClick={handleSearch}
+                    className="w-full h-[56px] bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                  >
+                    <Search className="w-5 h-5" />
+                    Search Vehicles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="max-w-4xl mx-auto mt-6 md:mt-12 text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
+            <h2 className="text-2xl md:text-4xl font-bold mb-4">
+              Want to Sell Your Vehicle?
+            </h2>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => router.push("/cars/filters")}
+                className="px-8 py-4 bg-white text-blue-600 font-bold rounded-2xl hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg"
+              >
+                <Search className="w-5 h-5" />
+                One Click Away
+              </button>
+              <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300">
+                Learn More
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
 }
+
+// Export as dynamic component with no SSR to prevent hydration issues
+export default dynamic(() => Promise.resolve(CleanVehicleMarketplace), {
+  ssr: false,
+});

@@ -1,0 +1,409 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Heart,
+  MapPin,
+  Calendar,
+  Eye,
+  Trash2,
+  Search,
+  Filter,
+  Car,
+  Bike,
+  Truck,
+} from "lucide-react";
+import dynamic from "next/dynamic";
+
+// ============ TYPES ============
+interface FavoriteItem {
+  id: string;
+  name: string;
+  type: "bike" | "car" | "cycle" | "tractor" | "auto" | "pickup" | "bus" | "truck";
+  year: number;
+  price: number;
+  location: string;
+  images: string[];
+  views: number;
+  kmDriven?: string;
+  cc?: string;
+  fuelType?: string;
+  condition: "new" | "used";
+  postedDate: string;
+}
+
+// ============ MOCK FAVORITES DATA ============
+const generateMockFavorites = (): FavoriteItem[] => [
+  {
+    id: "bike-1",
+    name: "Yamaha R15 V4",
+    type: "bike",
+    year: 2024,
+    price: 619000,
+    location: "Kathmandu, Bagmati",
+    images: ["/api/placeholder/400/300?text=Yamaha+R15"],
+    views: 247,
+    kmDriven: "8,500 km",
+    cc: "155cc",
+    condition: "used",
+    postedDate: "2024-11-10",
+  },
+  {
+    id: "car-1",
+    name: "Toyota Camry Hybrid",
+    type: "car",
+    year: 2023,
+    price: 3250000,
+    location: "Lalitpur, Bagmati",
+    images: ["/api/placeholder/400/300?text=Toyota+Camry"],
+    views: 156,
+    kmDriven: "12,000 km",
+    fuelType: "Hybrid",
+    condition: "used",
+    postedDate: "2024-11-12",
+  },
+  {
+    id: "cycle-1", 
+    name: "Giant Mountain Bike",
+    type: "cycle",
+    year: 2024,
+    price: 85000,
+    location: "Pokhara, Gandaki",
+    images: ["/api/placeholder/400/300?text=Giant+Cycle"],
+    views: 89,
+    condition: "new",
+    postedDate: "2024-11-08",
+  },
+  {
+    id: "tractor-1",
+    name: "Mahindra 575 DI",
+    type: "tractor", 
+    year: 2022,
+    price: 1250000,
+    location: "Chitwan, Bagmati",
+    images: ["/api/placeholder/400/300?text=Mahindra+Tractor"],
+    views: 134,
+    kmDriven: "850 hours",
+    condition: "used",
+    postedDate: "2024-11-05",
+  }
+];
+
+// ============ COMPONENTS ============
+const FavoriteCard: React.FC<{
+  item: FavoriteItem;
+  onRemove: (id: string) => void;
+  onItemClick: (item: FavoriteItem) => void;
+}> = ({ item, onRemove, onItemClick }) => {
+  const formatPrice = (price: number) => {
+    if (price >= 1000000) return `₨${(price / 100000).toFixed(1)}L`;
+    return `₨${price.toLocaleString()}`;
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "bike":
+      case "cycle":
+        return <Bike className="w-4 h-4" />;
+      case "car":
+      case "auto":
+        return <Car className="w-4 h-4" />;
+      case "tractor":
+      case "truck":
+      case "pickup":
+      case "bus":
+        return <Truck className="w-4 h-4" />;
+      default:
+        return <Car className="w-4 h-4" />;
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "bike":
+      case "cycle":
+        return "bg-blue-100 text-blue-800";
+      case "car":
+      case "auto":
+        return "bg-green-100 text-green-800";
+      case "tractor":
+      case "truck":
+      case "pickup":
+      case "bus":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Image Section */}
+      <div className="relative h-48">
+        <img
+          src={item.images[0]}
+          alt={item.name}
+          className="w-full h-full object-cover cursor-pointer"
+          onClick={() => onItemClick(item)}
+        />
+        
+        {/* Type Badge */}
+        <div className="absolute top-3 left-3">
+          <span className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 ${getTypeColor(item.type)}`}>
+            {getTypeIcon(item.type)}
+            {item.type.toUpperCase()}
+          </span>
+        </div>
+
+        {/* Remove Button */}
+        <div className="absolute top-3 right-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(item.id);
+            }}
+            className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+          >
+            <Heart className="w-4 h-4 fill-current" />
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        {/* Year, Name and Price */}
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-gray-900">{item.year}</span>
+            <h3 className="font-bold text-lg text-gray-900">{item.name}</h3>
+          </div>
+          <div className="text-xl font-bold" style={{ color: '#1e3a8a' }}>{formatPrice(item.price)}</div>
+        </div>
+
+        {/* Specs */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="flex justify-between">
+            <span className="text-xs text-gray-500">Type:</span>
+            <span className="text-sm font-medium capitalize">{item.type}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-xs text-gray-500">Condition:</span>
+            <span className="text-sm font-medium capitalize">{item.condition}</span>
+          </div>
+          {item.kmDriven && (
+            <div className="flex justify-between">
+              <span className="text-xs text-gray-500">Odometer:</span>
+              <span className="text-sm font-medium">{item.kmDriven}</span>
+            </div>
+          )}
+          {item.cc && (
+            <div className="flex justify-between">
+              <span className="text-xs text-gray-500">Engine:</span>
+              <span className="text-sm font-medium">{item.cc}</span>
+            </div>
+          )}
+          {item.fuelType && (
+            <div className="flex justify-between">
+              <span className="text-xs text-gray-500">Fuel:</span>
+              <span className="text-sm font-medium">{item.fuelType}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Location and Views */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <MapPin className="w-4 h-4" />
+            {item.location}
+          </div>
+          <div className="flex items-center gap-1 text-sm text-gray-500">
+            <Eye className="w-4 h-4" />
+            {item.views} views
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ MAIN COMPONENT ============
+function FavoritesPage() {
+  const router = useRouter();
+  const [favorites, setFavorites] = useState<FavoriteItem[]>(generateMockFavorites());
+  const [filteredFavorites, setFilteredFavorites] = useState<FavoriteItem[]>(favorites);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all");
+
+  // Apply filters
+  useEffect(() => {
+    let filtered = [...favorites];
+
+    // Search query
+    if (searchQuery) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.type.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Type filter
+    if (filterType !== "all") {
+      filtered = filtered.filter(item => item.type === filterType);
+    }
+
+    // Sort by date added (most recent first)
+    filtered.sort((a, b) => new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime());
+
+    setFilteredFavorites(filtered);
+  }, [favorites, searchQuery, filterType]);
+
+  // Handlers
+  const handleRemoveFavorite = (id: string) => {
+    setFavorites(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleItemClick = (item: FavoriteItem) => {
+    // Navigate to the specific item detail page based on type
+    const routes = {
+      bike: `/bikes/${item.id}`,
+      car: `/cars/${item.id}`,
+      cycle: `/cycles/${item.id}`,
+      tractor: `/tractors/${item.id}`,
+      auto: `/autos/${item.id}`,
+      pickup: `/pickups/${item.id}`,
+      bus: `/buses/${item.id}`,
+      truck: `/trucks/${item.id}`
+    };
+    
+    const route = routes[item.type] || `/vehicles/${item.id}`;
+    router.push(route);
+  };
+
+  const clearAllFavorites = () => {
+    setFavorites([]);
+  };
+
+  const vehicleTypes = ["all", "bike", "car", "cycle", "tractor", "auto", "pickup", "bus", "truck"];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Navbar Spacer */}
+      <div className="h-16 md:h-20"></div>
+      
+      {/* Header */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Favorites</h1>
+              <p className="text-gray-600 mt-1">All your saved vehicles in one place</p>
+            </div>
+            
+            {favorites.length > 0 && (
+              <button
+                onClick={clearAllFavorites}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search your favorites..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Type Filter */}
+            <div className="flex gap-2 overflow-x-auto">
+              {vehicleTypes.map(type => (
+                <button
+                  key={type}
+                  onClick={() => setFilterType(type)}
+                  className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                    filterType === type
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results Count */}
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-sm text-gray-600">
+              {filteredFavorites.length} {filteredFavorites.length === 1 ? 'favorite' : 'favorites'} found
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {filteredFavorites.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredFavorites.map((item) => (
+              <FavoriteCard
+                key={item.id}
+                item={item}
+                onRemove={handleRemoveFavorite}
+                onItemClick={handleItemClick}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Heart className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+              {searchQuery || filterType !== "all" ? "No favorites found" : "No favorites yet"}
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              {searchQuery || filterType !== "all" 
+                ? "Try adjusting your search or filter criteria." 
+                : "Start browsing and save vehicles you're interested in. They'll appear here for easy access."
+              }
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => router.push("/bikes")}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Browse Bikes
+              </button>
+              <button
+                onClick={() => router.push("/cars")}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Browse Cars
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default dynamic(() => Promise.resolve(FavoritesPage), {
+  ssr: false,
+});

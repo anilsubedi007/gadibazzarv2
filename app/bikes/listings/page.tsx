@@ -4,14 +4,13 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
-  MapPin,
-  Settings,
-  Gauge,
+  MapPin, Gauge,
   Heart,
   SlidersHorizontal,
   ChevronDown,
   X,
   Package,
+  Settings,
   Cog,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -746,7 +745,7 @@ const BikeCard: React.FC<BikeCardProps> = ({ bike, onSave, onImageClick, savedIt
         </div>
 
         {/* Specs */}
-        <div className="grid grid-cols-2 gap-10 md:gap-14 gap-3 mb-3">
+        <div className="grid grid-cols-2 gap-3 md:gap-10 xl:gap-14 mb-3">
           <div className="space-y-1">
             <div className="flex items-center">
               <span className="text-xs text-gray-700 flex items-center gap-2">
@@ -1220,7 +1219,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       {/* Click outside to close dropdown */}
       {openDropdown && (
         <div 
-          className="fixed inset-0 z-[-1]" 
+          className="fixed inset-0 z-[1]" 
           onClick={() => setOpenDropdown('')}
         />
       )}

@@ -1085,7 +1085,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
       {/* Click outside to close dropdown */}
       {openDropdown && (
         <div 
-          className="fixed inset-0 z-[-1]" 
+          className="fixed inset-0 z-[1]" 
           onClick={() => setOpenDropdown('')}
         />
       )}

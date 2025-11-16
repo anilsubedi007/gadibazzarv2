@@ -36,7 +36,7 @@ function CleanVehicleMarketplace() {
 
   const provinces = [
     "Province 1",
-    "Madhesh Province", 
+    "Madhesh Province",
     "Bagmati Province",
     "Gandaki Province",
     "Lumbini Province",
@@ -63,11 +63,11 @@ function CleanVehicleMarketplace() {
     router.push(`/cars/results?${params.toString()}`);
   }, [vehicleType, brand, province, router]);
 
-  // ✅ Mapping each category to its folder path
+  // fixed route (Cycle → lowercase folder)
   const categoryRoutes: Record<string, string> = {
     Cars: "/cars/listings",
     Bikes: "/bikes/listings",
-    Cycle: "/Cycle/listings",
+    Cycle: "/cycle/listings",
     Auto: "/auto/listings",
     Pickup: "/pickup/listings",
     Micro: "/micro/listings",
@@ -102,7 +102,6 @@ function CleanVehicleMarketplace() {
                     href={href}
                     className="group cursor-pointer text-center relative hover:transform hover:scale-105 transition-all duration-300"
                   >
-                    {/* Trending Badge */}
                     {item.trending && (
                       <div className="absolute -top-2 -right-2 md:-top-3 md:-right-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-2 py-1 md:px-3 md:py-1 rounded-full flex items-center gap-1 shadow-lg z-10">
                         <TrendingUp className="w-2 h-2 md:w-3 md:h-3" />
@@ -111,7 +110,6 @@ function CleanVehicleMarketplace() {
                       </div>
                     )}
 
-                    {/* Vehicle Image */}
                     <div className="mb-3 md:mb-4 flex justify-center">
                       <div className="w-20 h-20 md:w-20 md:h-20 flex items-center justify-center">
                         <img
@@ -123,7 +121,6 @@ function CleanVehicleMarketplace() {
                       </div>
                     </div>
 
-                    {/* Vehicle Type Name */}
                     <h3 className="font-bold text-gray-800 text-sm md:text-base group-hover:text-blue-600 transition-colors leading-tight px-1">
                       {item.type}
                     </h3>
@@ -145,6 +142,7 @@ function CleanVehicleMarketplace() {
 
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4">
+
                 {/* Vehicle Type */}
                 <div className="space-y-1 md:space-y-2">
                   <label className="block text-sm font-medium text-gray-900 md:text-gray-700">
@@ -212,6 +210,7 @@ function CleanVehicleMarketplace() {
                     Search Vehicles
                   </button>
                 </div>
+
               </div>
             </div>
           </div>
@@ -223,7 +222,7 @@ function CleanVehicleMarketplace() {
             <h2 className="text-2xl md:text-4xl font-bold mb-4">
               Want to Sell Your Vehicle?
             </h2>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => router.push("/cars/filters")}
@@ -232,16 +231,17 @@ function CleanVehicleMarketplace() {
                 <Search className="w-5 h-5" />
                 One Click Away
               </button>
+
               <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300">
                 Learn More
               </button>
             </div>
           </div>
         </section>
+
       </main>
     </div>
   );
 }
 
-// ✅ Export dynamically to prevent hydration issues
 export default dynamic(() => Promise.resolve(CleanVehicleMarketplace), { ssr: false });

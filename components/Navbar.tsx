@@ -27,18 +27,20 @@ export default function Navbar() {
 
   // ✅ Adds spacing so content doesn’t hide behind navbar
   useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = `
-      .page-content { padding-top: 5rem; }
-      @media (max-width: 768px) {
-        .page-content { padding-top: 4rem; }
-      }
-      body { margin: 0; padding: 0; }
-    `;
-    document.head.appendChild(style);
-    return () => document.head.removeChild(style);
-  }, []);
+  const style = document.createElement("style");
+  style.textContent = `
+    .page-content { padding-top: 5rem; }
+    @media (max-width: 768px) {
+      .page-content { padding-top: 4rem; }
+    }
+    body { margin: 0; padding: 0; }
+  `;
+  document.head.appendChild(style);
 
+  return () => {
+    document.head.removeChild(style);
+  };
+}, []);
   return (
     <header
       className={`fixed top-0 left-0 w-full bg-white backdrop-blur-md border-b border-gray-200 shadow-md z-50 transition-transform duration-300 ${
